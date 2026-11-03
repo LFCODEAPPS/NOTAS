@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Promedios - Universidad Científica del Sur</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #1c448e;
+            --primary-blue-dark: #122f66;
+            --accent-orange: #e67e22;
+            --bg-light: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-dark: #2c3e50;
+            --text-muted: #6c757d;
+            --border-color: #e2e8f0;
+            --success-color: #27ae60;
+            --danger-color: #e74c3c;
+            --danger-bg: #fdf2f2;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 650px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Header Principal */
+        .header {
+            background-color: var(--primary-blue);
+            color: #ffffff;
+            padding: 25px 30px;
+            text-align: center;
+            border-bottom: 4px solid var(--accent-orange);
+        }
+
+        .header h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .header h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        /* Tabla de Evaluaciones */
+        .grades-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+        }
+
+        .grades-table th {
+            text-align: left;
+            padding: 12px 10px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .grades-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        .eval-name {
+            font-weight: 500;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+        }
+
+        .input-group input {
+            width: 75px;
+            padding: 8px 10px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-align: center;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(28, 68, 142, 0.15);
+        }
+
+        .percent-symbol {
+            margin-left: 5px;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        /* Alerta de Porcentaje */
+        .weight-warning {
+            display: none;
+            background-color: var(--danger-bg);
+            color: var(--danger-color);
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+            text-align: center;
+            border: 1px solid rgba(231, 76, 60, 0.3);
+        }
+
+        /* Tarjeta de Resultados */
+        .results-card {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .average-title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .average-value {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 15px;
+        }
+
+        .status-badge.aprobado {
+            background-color: rgba(39, 174, 96, 0.15);
+            color: var(--success-color);
+        }
+
+        .status-badge.desaprobado {
+            background-color: rgba(231, 76, 60, 0.15);
+            color: var(--danger-color);
+        }
+
+        /* Proyección / Mensaje Rojo */
+        .forecast-box {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border-color);
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--danger-color);
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.4;
+        }
+
+        .note-info {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        @media (max-width: 480px) {
+            .content {
+                padding: 15px;
+            }
+            .grades-table th, .grades-table td {
+                padding: 8px 4px;
+            }
+            .input-group input {
+                width: 60px;
+                padding: 6px;
+            }
+            .header h1 {
+                font-size: 1.1rem;
+            }
+            .header h2 {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>UNIVERSIDAD CIENTÍFICA DEL SUR</h1>
+        <h2>Calculadora de Promedio Ponderado</h2>
+    </div>
+
+    <div class="content">
+        <div id="weightWarning" class="weight-warning">
+            La suma de los porcentajes debe ser exactamente 100%. (Actual: <span id="currentWeightSum">100</span>%)
+        </div>
+
+        <table class="grades-table">
+            <thead>
+                <tr>
+                    <th>Evaluación</th>
+                    <th style="width: 25%;">Peso (%)</th>
+                    <th style="width: 30%;">Nota (0-20)</th>
+                </tr>
+            </thead>
+            <tbody id="evaluationsBody">
+                <!-- Se genera dinámicamente -->
+            </tbody>
+        </table>
+
+        <div class="results-card">
+            <div class="average-title">Promedio Calculado</div>
+            <div class="average-value" id="averageDisplay">--</div>
+            <div id="statusBadge" class="status-badge" style="display: none;">-</div>
+            
+            <div class="forecast-box" id="forecastDisplay">
+                Ingresa tus notas para calcular el promedio o estimar la nota requerida.
+            </div>
+        </div>
+
+        <p class="note-info">
+            * Nota mínima aprobatoria: 13 (Aplica redondeo oficial: 12.5 es 13).
+        </p>
+    </div>
+</div>
+
+<script>
+    // Configuración inicial de evaluaciones y pesos
+    const defaultEvaluations = [
+        { name: "Evaluación Continua 1", weight: 20 },
+        { name: "Evaluación Parcial", weight: 20 },
+        { name: "Evaluación Continua 2", weight: 15 },
+        { name: "Evaluación Continua 3", weight: 20 },
+        { name: "Evaluación Final", weight: 25 }
+    ];
+
+    const evaluationsBody = document.getElementById('evaluationsBody');
+    const averageDisplay = document.getElementById('averageDisplay');
+    const statusBadge = document.getElementById('statusBadge');
+    const forecastDisplay = document.getElementById('forecastDisplay');
+    const weightWarning = document.getElementById('weightWarning');
+    const currentWeightSum = document.getElementById('currentWeightSum');
+
+    // Inicializar la tabla
+    function initTable() {
+        evaluationsBody.innerHTML = '';
+        defaultEvaluations.forEach((evalData, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="eval-name">${evalData.name}</td>
+                <td>
+                    <div class="input-group">
+                        <input type="number" class="weight-input" data-index="${index}" value="${evalData.weight}" min="0" max="100" step="1">
+                        <span class="percent-symbol">%</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="input-group">
+                        <input type="number" class="grade-input" data-index="${index}" placeholder="--" min="0" max="20" step="0.1">
+                    </div>
+                </td>
+            `;
+            evaluationsBody.appendChild(row);
+        });
+
+        // Agregar Event Listeners
+        document.querySelectorAll('.weight-input').forEach(input => {
+            input.addEventListener('input', calculateAverage);
+        });
+        document.querySelectorAll('.grade-input').forEach(input => {
+            input.addEventListener('input', calculateAverage);
+        });
+
+        calculateAverage();
+    }
+
+    function calculateAverage() {
+        const weightInputs = document.querySelectorAll('.weight-input');
+        const gradeInputs = document.querySelectorAll('.grade-input');
+
+        let totalWeight = 0;
+        let weightedSum = 0;
+        let filledWeightSum = 0;
+        let filledCount = 0;
+        let totalCount = weightInputs.length;
+
+        // Validar pesos acumulados
+        weightInputs.forEach(input => {
+            let val = parseFloat(input.value);
+            if (isNaN(val) || val < 0) val = 0;
+            totalWeight += val;
+        });
+
+        currentWeightSum.textContent = totalWeight.toFixed(0);
+        if (Math.abs(totalWeight - 100) > 0.01) {
+            weightWarning.style.display = 'block';
+        } else {
+            weightWarning.style.display = 'none';
+        }
+
+        // Procesar notas e índices faltantes
+        let missingIndices = [];
+        
+        gradeInputs.forEach((input, index) => {
+            const weight = parseFloat(weightInputs[index].value) || 0;
+            const gradeText = input.value.trim();
+
+            if (gradeText !== '') {
+                let grade = parseFloat(gradeText);
+                if (grade < 0) grade = 0;
+                if (grade > 20) grade = 20;
+                
+                weightedSum += grade * (weight / 100);
+                filledWeightSum += (weight / 100);
+                filledCount++;
+            } else {
+                missingIndices.push(index);
+            }
+        });
+
+        // 1. Mostrar Promedio Actual
+        if (filledCount > 0) {
+            // Aplica redondeo oficial (ej. 12.5 -> 13)
+            let rawAverage = weightedSum;
+            let roundedAverage = Math.round(rawAverage);
+
+            averageDisplay.textContent = rawAverage.toFixed(2);
+
+            statusBadge.style.display = 'inline-block';
+            if (roundedAverage >= 13) {
+                statusBadge.textContent = 'Aprobado';
+                statusBadge.className = 'status-badge aprobado';
+            } else {
+                statusBadge.textContent = 'Desaprobado';
+                statusBadge.className = 'status-badge desaprobado';
+            }
+        } else {
+            averageDisplay.textContent = '--';
+            statusBadge.style.display = 'none';
+        }
+
+        // 2. Calcular requerimiento para aprobar (Mínimo acumulado real requerido = 12.5)
+        const TARGET_MIN = 12.5;
+
+        if (filledCount === totalCount) {
+            let finalRounded = Math.round(weightedSum);
+            if (finalRounded >= 13) {
+                forecastDisplay.textContent = '¡Felicidades! Has completado todas tus notas y estás APROBADO.';
+                forecastDisplay.style.color = 'var(--success-color)';
+            } else {
+                forecastDisplay.textContent = 'Has completado todas las evaluaciones pero no alcanzaste la nota mínima aprobatoria (13).';
+                forecastDisplay.style.color = 'var(--danger-color)';
+            }
+        } else {
+            // Restablecer color rojo solicitado para alertas de nota requerida
+            forecastDisplay.style.color = 'var(--danger-color)';
+
+            let currentScore = weightedSum;
+            let remainingWeight = 1 - filledWeightSum;
+
+            if (remainingWeight <= 0) {
+                forecastDisplay.textContent = 'La suma de porcentajes de las notas ingresadas es 100%.';
+                return;
+            }
+
+            let neededScore = TARGET_MIN - currentScore;
+
+            if (neededScore <= 0) {
+                forecastDisplay.textContent = '¡Ya aseguraste el puntaje mínimo para aprobar (12.5 / 13)! Mantén tu rendimiento en las evaluaciones restantes.';
+                forecastDisplay.style.color = 'var(--success-color)';
+            } else {
+                let neededAvgInRemaining = neededScore / remainingWeight;
+
+                if (neededAvgInRemaining > 20) {
+                    forecastDisplay.textContent = `Aún sacando 20 en lo que falta, tu promedio final sería de ${(currentScore + (20 * remainingWeight)).toFixed(2)}. Ya no es posible aprobar.`;
+                } else if (missingIndices.length === 1) {
+                    let missingName = defaultEvaluations[missingIndices[0]].name;
+                    forecastDisplay.textContent = `Para aprobar el curso con 13, necesitas mínimo ${neededAvgInRemaining.toFixed(2)} en ${missingName}.`;
+                } else {
+                    forecastDisplay.textContent = `Para aprobar el curso con 13, necesitas un promedio mínimo de ${neededAvgInRemaining.toFixed(2)} en las ${missingIndices.length} evaluaciones restantes.`;
+                }
+            }
+        }
+    }
+
+    // Inicializar aplicación al cargar
+    document.addEventListener('DOMContentLoaded', initTable);
+</script>
+
+</body>
+</html>
