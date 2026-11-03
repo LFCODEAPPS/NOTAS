@@ -2,8 +2,19 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Deshabilita el zoom de pellizco e intenciones de escalado del usuario -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Calculadora de Promedios - Universidad Científica del Sur</title>
+
+    <!-- LOGO CIENTÍFICA (NC) EN SVG PARA ACCESO DIRECTO EN ANDROID Y iOS -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' width='512' height='512'><rect width='512' height='512' rx='110' fill='%231c448e'/><path d='M110 370V142h48l96 148V142h44v228h-46L154 220v150h-44z' fill='%23ffffff'/><path d='M402 188c-18-20-44-32-76-32-58 0-100 42-100 100s42 100 100 100c32 0 58-12 76-32v-38h-72v-36h114v106h-34l-8-18c-22 22-52 36-88 36-78 0-140-58-140-136S236 120 314 120c42 0 78 18 102 46l-14 22z' fill='%23e67e22'/></svg>">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' width='512' height='512'><rect width='512' height='512' rx='110' fill='%231c448e'/><path d='M110 370V142h48l96 148V142h44v228h-46L154 220v150h-44z' fill='%23ffffff'/><path d='M402 188c-18-20-44-32-76-32-58 0-100 42-100 100s42 100 100 100c32 0 58-12 76-32v-38h-72v-36h114v106h-34l-8-18c-22 22-52 36-88 36-78 0-140-58-140-136S236 120 314 120c42 0 78 18 102 46l-14 22z' fill='%23e67e22'/></svg>">
+
+    <!-- Configuración para App Web en Pantalla Completa -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Promedios NC">
+
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -26,6 +37,7 @@
             margin: 0;
             padding: 0;
             font-family: 'Roboto', sans-serif;
+            touch-action: manipulation; /* Previene gestos de zoom por defecto */
         }
 
         body {
@@ -36,6 +48,7 @@
             align-items: center;
             min-height: 100vh;
             padding: 20px;
+            user-select: none; /* Evita selección accidental al presionar rápido */
         }
 
         .container {
@@ -243,7 +256,7 @@
 <div class="container">
     <div class="header">
         <h1>UNIVERSIDAD CIENTÍFICA DEL SUR</h1>
-        <h2>Calculadora de Promedio Ponderado</h2>
+        <h2>Calculadora de Promedio</h2>
     </div>
 
     <div class="content">
@@ -260,7 +273,7 @@
                 </tr>
             </thead>
             <tbody id="evaluationsBody">
-                <!-- Se genera dinámicamente -->
+                <!-- Generación dinámica -->
             </tbody>
         </table>
 
@@ -281,6 +294,26 @@
 </div>
 
 <script>
+    // BLOQUEO ABSOLUTO DE ZOOM POR PELLIZCO Y DOBLE TOQUE
+    document.addEventListener('touchstart', function (event) {
+        if (event.touches.length > 1) {
+            event.preventDefault(); // Bloquea pellizco multi-touch
+        }
+    }, { passive: false });
+
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function (event) {
+        const now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 300) {
+            event.preventDefault(); // Bloquea doble toque rápido
+        }
+        lastTouchEnd = now;
+    }, false);
+
+    document.addEventListener('gesturestart', function (event) {
+        event.preventDefault(); // Bloquea gestos en Safari/iOS
+    });
+
     // Configuración inicial de evaluaciones y pesos
     const defaultEvaluations = [
         { name: "Evaluación Continua 1", weight: 20 },
@@ -297,7 +330,6 @@
     const weightWarning = document.getElementById('weightWarning');
     const currentWeightSum = document.getElementById('currentWeightSum');
 
-    // Inicializar la tabla
     function initTable() {
         evaluationsBody.innerHTML = '';
         defaultEvaluations.forEach((evalData, index) => {
@@ -319,7 +351,6 @@
             evaluationsBody.appendChild(row);
         });
 
-        // Agregar Event Listeners
         document.querySelectorAll('.weight-input').forEach(input => {
             input.addEventListener('input', calculateAverage);
         });
@@ -340,7 +371,6 @@
         let filledCount = 0;
         let totalCount = weightInputs.length;
 
-        // Validar pesos acumulados
         weightInputs.forEach(input => {
             let val = parseFloat(input.value);
             if (isNaN(val) || val < 0) val = 0;
@@ -354,7 +384,6 @@
             weightWarning.style.display = 'none';
         }
 
-        // Procesar notas e índices faltantes
         let missingIndices = [];
         
         gradeInputs.forEach((input, index) => {
@@ -374,9 +403,8 @@
             }
         });
 
-        // 1. Mostrar Promedio Actual
+        // 1. Promedio Actual
         if (filledCount > 0) {
-            // Aplica redondeo oficial (ej. 12.5 -> 13)
             let rawAverage = weightedSum;
             let roundedAverage = Math.round(rawAverage);
 
@@ -395,7 +423,7 @@
             statusBadge.style.display = 'none';
         }
 
-        // 2. Calcular requerimiento para aprobar (Mínimo acumulado real requerido = 12.5)
+        // 2. Requerimiento para aprobar (Mínimo real = 12.5)
         const TARGET_MIN = 12.5;
 
         if (filledCount === totalCount) {
@@ -408,7 +436,6 @@
                 forecastDisplay.style.color = 'var(--danger-color)';
             }
         } else {
-            // Restablecer color rojo solicitado para alertas de nota requerida
             forecastDisplay.style.color = 'var(--danger-color)';
 
             let currentScore = weightedSum;
@@ -439,7 +466,6 @@
         }
     }
 
-    // Inicializar aplicación al cargar
     document.addEventListener('DOMContentLoaded', initTable);
 </script>
 
