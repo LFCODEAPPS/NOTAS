@@ -2,18 +2,30 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <!-- Deshabilita el zoom de pellizco e intenciones de escalado -->
+    <!-- Deshabilita el zoom de pellizco y doble toque -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Calculadora de Promedios - Universidad Científica del Sur</title>
 
-    <!-- ICONO DESDE TU REPOSITORIO -->
-    <link rel="apple-touch-icon" href="images.png">
-    <link rel="icon" type="image/png" href="images.png">
+    <!-- ICONOS PARA iOS (SAFARI) Y NAVEGADORES ESTÁNDAR -->
+    <link rel="apple-touch-icon" sizes="180x180" href="./images.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="./images.png">
 
-    <!-- Configuración para App Web en Pantalla Completa -->
+    <!-- MANIFEST EMBEBIDO EN UN SOLO CÓDIGO (PARA ANDROID Y CHROME) -->
+    <link rel="manifest" href="data:application/manifest+json;utf8,{
+        %22short_name%22:%22Promedios%22,
+        %22name%22:%22Calculadora%20de%20Promedios%20-%20Cient%C3%ADfica%22,
+        %22icons%22:[{%22src%22:%22./images.png%22,%22sizes%22:%22192x192%22,%22type%22:%22image/png%22,%22purpose%22:%22any%20maskable%22}],
+        %22start_url%22:%22./%22,
+        %22background_color%22:%22%231c448e%22,
+        %22theme_color%22:%22%231c448e%22,
+        %22display%22:%22standalone%22
+    }">
+
+    <!-- Configuración PWA / PANTALLA COMPLETA EN iOS -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Promedios NC">
+    <meta name="theme-color" content="#1c448e">
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
